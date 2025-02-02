@@ -1,17 +1,28 @@
 import streamlit as st
 import os
-from pymongo import MongoClient
-from bson import ObjectId
+from sqlalchemy import create_engine, Column, Integer, String, Text
+from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 
 # Carregar variáveis de ambiente
 load_dotenv()
 
-# Configurações do MongoDB Atlas
-MONGO_URI = os.getenv('MONGO_URI')
-client = MongoClient(MONGO_URI)
-db = client['portfolio_db']
-posts_collection = db['posts']
+# Configuração do SQLite
+DATABASE_URL = 'sqlite:///portfolio.db'
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Modelo do banco de dados
+class Post(Base):
+    __tablename__ = 'posts'
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    file_path = Column(String, nullable=True)
+
+# Criar tabelas
+Base.metadata.create_all(bind=engine)
 
 # Diretório para salvar arquivos
 if not os.path.exists('posts'):
@@ -23,8 +34,8 @@ if not os.path.exists('uploads'):
 st.set_page_config(page_title="Portfólio", layout="wide")
 
 # Dados de login (exemplo simples)
-USERNAME = "admin"
-PASSWORD = "senha123"
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
 
 # Função para login
 def login():
@@ -77,14 +88,12 @@ def admin_page():
             # Salvar post como arquivo markdown
             post_file = save_post_to_file(title, content, file_path)
 
-            # Salvar post no MongoDB
-            post_data = {
-                "title": title,
-                "content": content,
-                "file_path": file_path,
-                "post_file": post_file
-            }
-            posts_collection.insert_one(post_data)
+            # Salvar post no SQLite
+            db = SessionLocal()
+            new_post = Post(title=title, content=content, file_path=file_path)
+            db.add(new_post)
+            db.commit()
+            db.close()
 
             st.success("Post publicado com sucesso!")
             st.session_state['page'] = "Posts Públicos"
@@ -99,16 +108,18 @@ def admin_page():
 def public_page():
     st.title("Posts Públicos")
     
-    posts = list(posts_collection.find())
+    db = SessionLocal()
+    posts = db.query(Post).all()
+    db.close()
 
     for post in posts:
-        st.subheader(post['title'])
-        st.write(post['content'])
-        if post.get('file_path'):
-            if post['file_path'].endswith(('png', 'jpg', 'jpeg')):
-                st.image(post['file_path'])
-            elif post['file_path'].endswith('mp4'):
-                st.video(post['file_path'])
+        st.subheader(post.title)
+        st.write(post.content)
+        if post.file_path:
+            if post.file_path.endswith(('png', 'jpg', 'jpeg')):
+                st.image(post.file_path)
+            elif post.file_path.endswith('mp4'):
+                st.video(post.file_path)
         st.markdown("---")
 
 # Menu de navegação
