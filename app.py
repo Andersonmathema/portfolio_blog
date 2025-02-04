@@ -44,7 +44,28 @@ st.set_page_config(page_title="Portfólio", layout="wide")
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 
-# ... (funções login e logout permanecem iguais)
+# Função para login
+def login():
+    st.title("Login")
+    username = st.text_input("Usuário", key='login_user')
+    password = st.text_input("Senha", type="password", key='login_pass')
+    
+    if st.button("Entrar", key='login_button'):
+        if username == USERNAME and password == PASSWORD:
+            st.session_state['logged_in'] = True
+            st.success("Login bem-sucedido!")
+            st.session_state['page'] = "Administração de Posts"
+            st.rerun()
+        else:
+            st.error("Usuário ou senha incorretos.")
+
+# Função para logout
+def logout():
+    if st.button("Sair", key='logout_button'):
+        st.session_state.pop('logged_in', None)
+        st.success("Você saiu com sucesso!")
+        st.session_state['page'] = "Posts Públicos"
+        st.rerun()
 
 # Função para salvar post em arquivo markdown (adaptada)
 def save_post_to_file(premissa, competencia, macro_indicador, micro_indicador, acao, evidencias, descricao):
