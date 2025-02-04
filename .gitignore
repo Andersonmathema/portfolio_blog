@@ -3,5 +3,6 @@ venv
 .env
 /posts
 /uploads
+portfolio.db
 
 
