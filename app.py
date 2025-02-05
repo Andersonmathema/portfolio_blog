@@ -136,6 +136,19 @@ def admin_page():
 def public_page():
     st.title("Portfólio Desenvolvimento de sistemas")
 
+    col1, col2 = st.columns(2)
+    with col2:
+        st.text("""Sou Ana Lívia Nunes de Carvalho, professora da rede estadual de ensino de São Paulo,
+                 atualmente, trabalho na Escola Estadual Maria Carolina de Lima de Ensino Integral,
+                 localizada em Nuporanga. Nessa escola atuo como professora de Língua Portuguesa
+                 e Redação e Leitura.
+                Este portifólio tem intuito de evidenciar ações desenvolvidas na escola, além de servir
+                como replicabilidade do Programa Ensino Integral.
+                Formação acadêmica: Licenciatura em Letras- Português e Inglês pela Barão de Mauá
+                Pós em História e Cultura Afro-Brasileiras., pela Unyleya.""")
+        
+        st.image("uploads/foto3-2025.jpg")
+
     db = SessionLocal()
     posts = db.query(Post).all()
     db.close()
