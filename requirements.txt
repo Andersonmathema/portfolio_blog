@@ -67,7 +67,7 @@ toml==0.10.2
 tornado==6.4.2
 typing_extensions==4.12.2
 tzdata==2025.1
-urllib3==2.3.0
+urllib3==2.6.3
 watchdog==6.0.0
 websockets==14.2
 yarl==1.18.3
