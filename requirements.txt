@@ -40,7 +40,7 @@ pillow==13.0.0  # Pillow (PIL) é essencial para manipulação de imagens
 postgrest==0.19.3
 propcache==0.2.1
 protobuf==5.29.6
-pyarrow==19.0.0
+pyarrow==23.0.1
 pydantic==2.10.6
 pydantic_core==2.27.2
 pydeck==0.9.1
